@@ -33,7 +33,9 @@ const start = async () => {
     engines: {
       ejs,
     },
-    // compileMode: 'async', // je ne le maitrise pas encore, tourne dans le vide
+    compileOptions: {
+      rmWhitespace: true,
+    },
     relativeTo: __dirname,
     path: 'templates',
   })
