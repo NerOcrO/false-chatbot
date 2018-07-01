@@ -11,7 +11,8 @@
   "author": "NerOcrO",
   "license": "ISC",
   "engines": {
-    "node": ">=8"
+    "node": ">=8.0.0",
+    "npm": ">=5.0.0"
   },
   "dependencies": {
     "axios": "^0.18.0",

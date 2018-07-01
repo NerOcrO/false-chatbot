@@ -1,6 +1,7 @@
 # False chatbot
 
-![node version](https://img.shields.io/badge/node-&#10878;8-green.svg)
+![node version](https://img.shields.io/badge/node-&#10878;8.0.0-green.svg)
+![npm version](https://img.shields.io/badge/npm-&#10878;5.0.0-green.svg)
 ![ISC license](https://img.shields.io/badge/licence-ISC-blue.svg)
 
 ## Install
