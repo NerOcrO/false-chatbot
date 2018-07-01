@@ -45,3 +45,11 @@ Example:
   {"userMessage":"test3","botResponse":"One rage every three months is permitted. Try not to hurt anyone who doesn't deserve it."}
 ]
 ```
+
+## Documentation
+
+* <https://github.com/axios/axios>
+* <https://github.com/visionmedia/debug>
+* <http://ejs.co/#docs>
+* <https://hapijs.com/>
+* <https://docs.mongodb.com/>
