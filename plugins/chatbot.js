@@ -1,4 +1,4 @@
-import axios from 'axios'
+import fetch from 'node-fetch'
 import boom from 'boom'
 
 const chatbot = {
@@ -20,14 +20,16 @@ const chatbot = {
         method: 'POST',
         path: '/',
         async handler(request) {
-          const swansonQuotes = await axios.get('http://ron-swanson-quotes.herokuapp.com/v2/quotes')
+          const swansonQuotes = await fetch('http://ron-swanson-quotes.herokuapp.com/v2/quotes')
+            .then(response => response.json())
+            .catch(error => console.error(error))
           let result = await request.mongo.db.collection('chatbot').findOne({ userId: request.payload.user_id, 'thread.id': request.state.id })
 
           if (result) {
             const values = {
               'thread.$.messages': {
                 userMessage: request.payload.message,
-                botResponse: swansonQuotes.data[0],
+                botResponse: swansonQuotes[0],
               },
             }
 
@@ -40,7 +42,7 @@ const chatbot = {
             return {
               userId: request.payload.user_id,
               userMessage: request.payload.message,
-              botResponse: swansonQuotes.data[0],
+              botResponse: swansonQuotes[0],
               threadId: request.state.id,
             }
           }
@@ -54,7 +56,7 @@ const chatbot = {
                 messages: [
                   {
                     userMessage: request.payload.message,
-                    botResponse: swansonQuotes.data[0],
+                    botResponse: swansonQuotes[0],
                   },
                 ],
               },
@@ -69,7 +71,7 @@ const chatbot = {
             return {
               userId: request.payload.user_id,
               userMessage: request.payload.message,
-              botResponse: swansonQuotes.data[0],
+              botResponse: swansonQuotes[0],
               threadId: request.state.id,
             }
           }
@@ -82,7 +84,7 @@ const chatbot = {
                 messages: [
                   {
                     userMessage: request.payload.message,
-                    botResponse: swansonQuotes.data[0],
+                    botResponse: swansonQuotes[0],
                   },
                 ],
               },

@@ -48,8 +48,8 @@ Example:
 
 ## Documentation
 
-* <https://github.com/axios/axios>
 * <https://github.com/visionmedia/debug>
 * <http://ejs.co/#docs>
 * <https://hapijs.com/>
 * <https://docs.mongodb.com/>
+* <https://github.com/bitinn/node-fetch>
