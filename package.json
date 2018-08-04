@@ -4,7 +4,7 @@
   "description": "Workshop",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUG=chatbot nodemon index.js --exec babel-node",
+    "dev": "DEBUG=chatbot nodemon index.js",
     "start": "node -r babel-register index.js"
   },
   "keywords": [],
