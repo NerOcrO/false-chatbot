@@ -20,84 +20,89 @@ const chatbot = {
         method: 'POST',
         path: '/',
         async handler(request) {
-          const swansonQuotes = await fetch('http://ron-swanson-quotes.herokuapp.com/v2/quotes')
-            .then(response => response.json())
-            .catch(error => console.error(error))
-          let result = await request.mongo.db.collection('chatbot').findOne({ userId: request.payload.user_id, 'thread.id': request.state.id })
+          const quoteResponse = await fetch('http://ron-swanson-quotes.herokuapp.com/v2/quotes')
 
-          if (result) {
-            const values = {
-              'thread.$.messages': {
+          try {
+            const swansonQuotes = await quoteResponse.json()
+            let result = await request.mongo.db.collection('chatbot').findOne({ userId: request.payload.user_id, 'thread.id': request.state.id })
+
+            if (result) {
+              const values = {
+                'thread.$.messages': {
+                  userMessage: request.payload.message,
+                  botResponse: swansonQuotes[0],
+                },
+              }
+
+              const response = await request.mongo.db.collection('chatbot').updateOne({ userId: request.payload.user_id, 'thread.id': request.state.id }, { $push: values })
+
+              if (!response.result.nModified) {
+                throw boom.badData('Bad data')
+              }
+
+              return {
+                userId: request.payload.user_id,
                 userMessage: request.payload.message,
                 botResponse: swansonQuotes[0],
-              },
+                threadId: request.state.id,
+              }
             }
 
-            const response = await request.mongo.db.collection('chatbot').updateOne({ userId: request.payload.user_id, 'thread.id': request.state.id }, { $push: values })
+            result = await request.mongo.db.collection('chatbot').findOne({ userId: request.payload.user_id })
 
-            if (!response.result.nModified) {
-              throw boom.badData('Bad data')
+            if (result) {
+              const values = {
+                thread: {
+                  id: request.state.id,
+                  messages: [
+                    {
+                      userMessage: request.payload.message,
+                      botResponse: swansonQuotes[0],
+                    },
+                  ],
+                },
+              }
+
+              const response = await request.mongo.db.collection('chatbot').updateOne({ userId: request.payload.user_id }, { $push: values })
+
+              if (!response.result.nModified) {
+                throw boom.badData('Bad data')
+              }
+
+              return {
+                userId: request.payload.user_id,
+                userMessage: request.payload.message,
+                botResponse: swansonQuotes[0],
+                threadId: request.state.id,
+              }
             }
 
-            return {
-              userId: request.payload.user_id,
-              userMessage: request.payload.message,
-              botResponse: swansonQuotes[0],
-              threadId: request.state.id,
-            }
-          }
-
-          result = await request.mongo.db.collection('chatbot').findOne({ userId: request.payload.user_id })
-
-          if (result) {
             const values = {
-              thread: {
-                id: request.state.id,
-                messages: [
-                  {
-                    userMessage: request.payload.message,
-                    botResponse: swansonQuotes[0],
-                  },
-                ],
-              },
+              userId: request.payload.user_id,
+              thread: [
+                {
+                  id: request.state.id,
+                  messages: [
+                    {
+                      userMessage: request.payload.message,
+                      botResponse: swansonQuotes[0],
+                    },
+                  ],
+                },
+              ],
             }
 
-            const response = await request.mongo.db.collection('chatbot').updateOne({ userId: request.payload.user_id }, { $push: values })
+            const response = await request.mongo.db.collection('chatbot').insert(values)
 
-            if (!response.result.nModified) {
+            if (!response.insertedCount) {
               throw boom.badData('Bad data')
             }
 
-            return {
-              userId: request.payload.user_id,
-              userMessage: request.payload.message,
-              botResponse: swansonQuotes[0],
-              threadId: request.state.id,
-            }
+            return response.ops
           }
-
-          const values = {
-            userId: request.payload.user_id,
-            thread: [
-              {
-                id: request.state.id,
-                messages: [
-                  {
-                    userMessage: request.payload.message,
-                    botResponse: swansonQuotes[0],
-                  },
-                ],
-              },
-            ],
+          catch (error) {
+            console.error(error)
           }
-
-          const response = await request.mongo.db.collection('chatbot').insert(values)
-
-          if (!response.insertedCount) {
-            throw boom.badData('Bad data')
-          }
-
-          return response.ops
         },
       },
       // Get the threadId.
